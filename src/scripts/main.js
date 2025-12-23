@@ -398,13 +398,42 @@ function initDownloadPage() {
         return;
       }
 
+      // Clear existing interval if any
+      if (resultDiv._countdownInterval) {
+        clearInterval(resultDiv._countdownInterval);
+      }
+
       // Check expiry (24h)
+      let countdownInterval;
+
+      function updateCountdown() {
+        const created = new Date(data.created_at);
+        const expiryTime = new Date(created.getTime() + 24 * 60 * 60 * 1000);
+        const now = new Date();
+        const diffMs = expiryTime - now;
+
+        if (diffMs <= 0) {
+          clearInterval(countdownInterval);
+          showToast('This file has expired.', 'error');
+          resultDiv.innerHTML = '';
+          return;
+        }
+
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+        const timeLeftElement = document.getElementById('time-left');
+        if (timeLeftElement) {
+          timeLeftElement.innerHTML = `<i class="fa-regular fa-clock"></i> Expires in: ${hours}h ${minutes}m ${seconds}s`;
+        }
+      }
+
       if (data.created_at) {
         const created = new Date(data.created_at);
         const now = new Date();
         const diffHours = (now - created) / 1000 / 60 / 60;
         if (diffHours > 24) {
-          // showError('This file has expired.');
           showToast('This file has expired.', 'error');
           resultDiv.innerHTML = '';
           return;
@@ -420,12 +449,20 @@ function initDownloadPage() {
           <h3><i class="fa-solid fa-circle-check"></i> File Found</h3>
           <p><strong>Name:</strong> ${data.file_name}</p>
           <p><strong>Size:</strong> ${formatFileSize(data.file_size)}</p>
+          <p id="time-left" class="expiry-timer" style="color: var(--slate-500--); font-size: 0.9em; margin-top: 10px;"></p>
 
           <button id="force-download-btn" class="download-btn" style="margin-top: 15px;">
             Download Now
           </button>
         </div>
       `;
+
+      // Start countdown
+      updateCountdown();
+      countdownInterval = setInterval(updateCountdown, 1000);
+
+      // Store interval on the element to clear it if another search happens
+      resultDiv._countdownInterval = countdownInterval;
 
       // Add click handler for force download
       document.getElementById('force-download-btn').addEventListener('click', async () => {
