@@ -1,0 +1,55 @@
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Add life to buttons */
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* File List Item Entry */
+.file-item {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Success icon in result */
+.success h3 i {
+    color: #10b981;
+    margin-right: 8px;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Hover effects */
+.download-btn:hover,
+#upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.copy-btn:hover {
+    background: var(--slate-700--) !important;
+}
+
+.remove-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
