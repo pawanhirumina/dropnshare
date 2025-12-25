@@ -8,7 +8,7 @@ export default defineConfig({
                 main: resolve(__dirname, 'index.html'),
                 download: resolve(__dirname, 'download.html'),
                 about: resolve(__dirname, 'about.html'),
-                notfound: resolve(__dirname, 'notfound.html'),
+                notfound: resolve(__dirname, '404.html'),
             },
         },
     },
