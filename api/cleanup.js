@@ -22,7 +22,8 @@ module.exports = async (req, res) => {
         const { data: expiredFiles, error: fetchError } = await supabase
             .from('shared_files')
             .select('id, file_path')
-            .lt('created_at', cutoffDate);
+            .lt('created_at', cutoffDate)
+            .not('file_past', 'like', 'demo/%');
 
         if (fetchError) throw fetchError;
 
