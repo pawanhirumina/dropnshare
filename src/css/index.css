@@ -1,3 +1,6 @@
+
+@import url(./animations.css);
+
 :root {
   --slate-950--: #020617;
   --slate-900--: #0f172a;
@@ -21,7 +24,6 @@
 
 header {
   width: 100%;
-
   position: absolute;
   display: flex;
   justify-content: space-between;
@@ -66,7 +68,7 @@ body {
 h1 {
   font-size: 2em;
   margin-bottom: 10px;
-  color: var(--slate-500--);
+  color: var(--slate-700--);
 }
 
 p.description {
@@ -447,21 +449,6 @@ p.description {
 
 
 
-@import url(./animations.css);
-
-:root {
-  --slate-950--: #020617;
-  --slate-900--: #0f172a;
-  --slate-850--: #1e293b;
-  --slate-800--: #334155;
-  --slate-750--: #475569;
-  --slate-700--: #64748b;
-  --slate-650--: #94a3b8;
-  --slate-600--: #cbd5e1;
-  --slate-550--: #e2e8f0;
-  --slate-500--: #f1f5f9;
-  --slate-450--: #f8fafc;
-}
 
 #toast-container {
   position: fixed;
