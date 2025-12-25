@@ -218,7 +218,7 @@ function initUploadPage() {
             .from('shared_files')
             .insert({
               code: code,
-              file_name: `${file.name}${timestamp}.zip`, // User friendly name
+              file_name: `Dropnshare-${timestamp}.zip`, // User friendly name
               file_path: fileName,
               file_size: zipBlob.size
             });
@@ -227,7 +227,7 @@ function initUploadPage() {
 
           // Success
           results.push({
-            fileName: `${file.name}${timestamp}.zip (Bundle)`,
+            fileName: `Dropnshare-${timestamp}.zip`,
             code: code
           });
           successCount = filesArray.length; // All files uploaded as one
