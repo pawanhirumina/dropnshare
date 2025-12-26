@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
             .from('shared_files')
             .select('id, file_path')
             .lt('created_at', cutoffDate)
-            .not('file_past', 'like', 'demo/%');
+            .not('file_path', 'like', 'demo/%');
 
         if (fetchError) throw fetchError;
 
