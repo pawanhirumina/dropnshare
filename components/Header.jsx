@@ -5,11 +5,21 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getCurrentUser } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
+import { Menu } from 'lucide-react'
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet'
 
 
 export default function Header() {
     const pathname = usePathname()
+    // eslint-disable-next-line no-unused-vars
     const [user, setUser] = useState(null)
+    const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
         getCurrentUser().then(setUser)
@@ -37,8 +47,8 @@ export default function Header() {
                                 key={item.href}
                                 href={item.href}
                                 className={`text-sm font-medium transition-colors hover:text-primary ${pathname === item.href
-                                        ? 'text-foreground'
-                                        : 'text-muted-foreground'
+                                    ? 'text-foreground'
+                                    : 'text-muted-foreground'
                                     }`}
                             >
                                 {item.label}
@@ -47,8 +57,43 @@ export default function Header() {
 
                     </nav>
                 </div>
+
+                {/* Mobile Sidebar */}
+                <div className="md:hidden">
+                    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                        <SheetTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <Menu className="h-6 w-6" />
+                                <span className="sr-only">Toggle menu</span>
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="left">
+                            <SheetHeader>
+                                <SheetTitle className="text-left font-bold text-xl bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+                                    Drop & Share
+                                </SheetTitle>
+                            </SheetHeader>
+                            <div className="flex flex-col gap-4 mt-8">
+                                {navItems.map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={() => setIsOpen(false)}
+                                        className={`text-lg font-medium transition-colors hover:text-primary ${pathname === item.href
+                                            ? 'text-primary'
+                                            : 'text-muted-foreground'
+                                            }`}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
+
                 {/* #1 : Payment is not setup fix later */}
-                {/* <div className="flex items-center gap-4">
+                {/* <div className="hidden md:flex items-center gap-4">
                     {user ? (
                         <Button asChild variant="outline">
                             <Link href="/account">Account</Link>
