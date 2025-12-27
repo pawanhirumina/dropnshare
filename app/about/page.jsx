@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-
+import { Analytics } from "@vercel/analytics/next"
 export default function AboutPage() {
     return (
         <div className="container py-12">
+              <Analytics/>
             <div className="max-w-3xl mx-auto space-y-8">
                 <div className="text-center space-y-4">
                     <h1 className="text-4xl font-bold">Why I Built Drop & Share</h1>

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
-
+import { Analytics } from "@vercel/analytics/next"
 function DownloadContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -96,7 +96,9 @@ function DownloadContent() {
     }
 
     return (
+        
         <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)]">
+              <Analytics/>
             <Card className="w-full max-w-md">
                 <CardContent className="pt-6 space-y-6">
                     <div className="text-center space-y-2">
