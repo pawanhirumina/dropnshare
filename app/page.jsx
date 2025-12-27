@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { Analytics } from "@vercel/analytics/next"
 
 const CODE_LENGTH = 6
 
@@ -179,6 +180,7 @@ export default function UploadPage() {
     if (uploadCode) {
         return (
             <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)]">
+                <Analytics/>
                 <Card className="w-full max-w-md">
                     <CardContent className="pt-6">
                         <div className="text-center space-y-4">
