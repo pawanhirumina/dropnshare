@@ -15,15 +15,15 @@ module.exports = async (req, res) => {
     const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
     try {
-        // 1. Calculate the cutoff time (24 hours ago)
-        const cutoffDate = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        // 1. Fetch files that have expired
+        // We delete anything where expires_at < NOW()
+        const now = new Date().toISOString()
 
-        // 2. Fetch files that have expired
         const { data: expiredFiles, error: fetchError } = await supabase
             .from('shared_files')
-            .select('id, file_path')
-            .lt('created_at', cutoffDate)
-            .not('file_path', 'like', 'demo/%');
+            .select('id, file_path, bucket_id')
+            .not('expires_at', 'is', null) // Only check files with expiration
+            .lt('expires_at', now)
 
         if (fetchError) throw fetchError;
 
@@ -31,18 +31,27 @@ module.exports = async (req, res) => {
             return res.status(200).json({ message: 'No expired files to cleanup' });
         }
 
-        // 3. Delete files from storage
-        const filePaths = expiredFiles.map(f => f.file_path);
-        const { error: storageError } = await supabase.storage
-            .from('shared-files')
-            .remove(filePaths);
+        console.log(`Found ${expiredFiles.length} expired files. Cleaning up...`)
 
-        if (storageError) {
-            console.error('Error deleting from storage:', storageError);
-            // We continue to delete from DB even if some storage deletion failed, or handle partially
+        // 2. Delete files from storage
+        // We need to group by bucket_id to delete efficiently
+        const filesByBucket = expiredFiles.reduce((acc, file) => {
+            const bucket = file.bucket_id || 'shared-files-public' 
+            // Default to public if bucket_id missing (legacy files)
+            if (!acc[bucket]) acc[bucket] = []
+            acc[bucket].push(file.file_path)
+            return acc
+        }, {})
+
+        for (const [bucket, paths] of Object.entries(filesByBucket)) {
+            const { error: storageError } = await supabase.storage
+                .from(bucket)
+                .remove(paths);
+            
+            if (storageError) console.error(`Error deleting from ${bucket}:`, storageError);
         }
 
-        // 4. Delete records from database
+        // 3. Delete records from database
         const fileIds = expiredFiles.map(f => f.id);
         const { error: dbError } = await supabase
             .from('shared_files')
