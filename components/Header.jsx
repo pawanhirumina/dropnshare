@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getCurrentUser } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
-import { Menu } from 'lucide-react'
+import { Menu, Github } from 'lucide-react'
 import {
     Sheet,
     SheetContent,
@@ -87,12 +87,27 @@ export default function Header() {
                                         {item.label}
                                     </Link>
                                 ))}
+                                <Link
+                                    href="https://github.com/pawanhirumina/drop-n-share"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-lg font-medium transition-colors hover:text-primary flex items-center gap-2"
+                                >
+                                    <Github className="h-5 w-5" />
+                                    GitHub Repo
+                                </Link>
                             </div>
                         </SheetContent>
                     </Sheet>
                 </div>
 
                 <div className="hidden md:flex items-center gap-4">
+                    <Button asChild variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+                        <Link href="https://github.com/pawanhirumina/drop-n-share" target="_blank" rel="noopener noreferrer">
+                            <Github className="h-5 w-5" />
+                            <span className="sr-only">GitHub Repository</span>
+                        </Link>
+                    </Button>
                     {user ? (
                         <Button asChild variant="outline">
                             <Link href="/account">Account</Link>
@@ -104,6 +119,6 @@ export default function Header() {
                     )}
                 </div>
             </div>
-        </header>
+        </header >
     )
 }
