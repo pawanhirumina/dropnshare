@@ -17,13 +17,6 @@ export async function POST(request) {
     }
 
     const session = await client.payments.create({
-      billing: {
-        city: 'New York',
-        country: 'US',
-        state: 'NY',
-        street: '123 Main St',
-        zipcode: '10001'
-      },
       customer: {
         email: user.email,
         name: user.email,
@@ -33,7 +26,7 @@ export async function POST(request) {
         quantity: 1
       }],
       payment_link: true,
-      return_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/payment/success`, 
+      return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/success`, 
       metadata: {
         userId: user.id
       }

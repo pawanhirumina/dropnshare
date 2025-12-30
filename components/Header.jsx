@@ -30,6 +30,7 @@ export default function Header() {
         { href: '/download', label: 'Download' },
         { href: '/pricing', label: 'Pricing' },
         { href: '/about', label: 'About' },
+        { href: '/account', label: 'Account' }
     ]
 
     return (
