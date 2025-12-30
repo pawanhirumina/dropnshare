@@ -7,7 +7,7 @@ import { Upload, X, FileIcon, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUser, getUserProfile } from '@/lib/auth'
 import { Analytics } from "@vercel/analytics/next"
 
 const CODE_LENGTH = 6
@@ -15,15 +15,24 @@ const CODE_LENGTH = 6
 export default function UploadPage() {
     const router = useRouter()
     const [user, setUser] = useState(null)
+    const [profile, setProfile] = useState(null)
     const [files, setFiles] = useState([])
     const [uploading, setUploading] = useState(false)
     const [progress, setProgress] = useState(0)
     const [uploadCode, setUploadCode] = useState(null)
     const [dragActive, setDragActive] = useState(false)
-    const [expiration, setExpiration] = useState('forever')
+    const [expiration, setExpiration] = useState('forever') // Default for UI, logic handles override
 
     useEffect(() => {
-        getCurrentUser().then(setUser)
+        const loadUser = async () => {
+            const currentUser = await getCurrentUser()
+            setUser(currentUser)
+            if (currentUser) {
+                const userProfile = await getUserProfile(currentUser.id)
+                setProfile(userProfile)
+            }
+        }
+        loadUser()
     }, [])
 
     const handleDrag = (e) => {
@@ -58,7 +67,7 @@ export default function UploadPage() {
 
         const validFiles = newFiles.filter(file => {
             if (file.size > maxSize) {
-                alert(`${file.name} exceeds 50MB limit.`)
+                toast.error(`${file.name} exceeds 50MB limit.`)
                 return false
             }
             return true
@@ -119,6 +128,8 @@ export default function UploadPage() {
             // Upload to Supabase
             const timestamp = Date.now()
             const fileName = `bundle_${timestamp}_${Math.random().toString(36).substring(2, 8)}.zip`
+
+            // Bucket selection: User -> Private, Guest -> Public
             const bucketName = user ? 'shared-files-private' : 'shared-files-public'
 
             const { error: uploadError } = await supabase.storage
@@ -135,12 +146,21 @@ export default function UploadPage() {
             let expiresAt = null // Default null (Forever)
 
             if (!user) {
-                // Free users always 24h
+                // Guest: 24 hours
                 expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-            } else if (expiration !== 'forever') {
-                // Pro user selection
-                const hours = parseInt(expiration)
-                expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString()
+            } else {
+                // Logged-in User
+                if (profile?.plan === 'pro') {
+                    // Pro: Use selection
+                    if (expiration !== 'forever') {
+                        const hours = parseInt(expiration)
+                        expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString()
+                    }
+                    // If 'forever', expiresAt remains null
+                } else {
+                    // Free Logged-in: 48 hours (2 days)
+                    expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+                }
             }
 
             // Save to database
@@ -180,7 +200,7 @@ export default function UploadPage() {
     if (uploadCode) {
         return (
             <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)]">
-                <Analytics/>
+                <Analytics />
                 <Card className="w-full max-w-md">
                     <CardContent className="pt-6">
                         <div className="text-center space-y-4">
@@ -197,7 +217,7 @@ export default function UploadPage() {
                                     className="flex-1"
                                     onClick={() => {
                                         navigator.clipboard.writeText(uploadCode)
-                                        alert('Code copied!')
+                                        toast.success('Code copied!')
                                     }}
                                 >
                                     Copy Code
@@ -250,14 +270,16 @@ export default function UploadPage() {
                         <div>
                             <p className="text-lg font-medium">Drop files here or click to upload</p>
                             <p className="text-sm text-muted-foreground mt-1">
-                                {user ? 'Pro: Files kept forever (or valid until expiry)' : 'Free: Files expire in 24h'}
+                                {!user && 'Free: Files expire in 24h'}
+                                {user && profile?.plan !== 'pro' && 'Free Account: Files expire in 48h'}
+                                {user && profile?.plan === 'pro' && 'Pro: Files kept forever (or valid until expiry)'}
                             </p>
 
                         </div>
                     </div>
                 </div>
 
-                {user && (
+                {user && profile?.plan === 'pro' && (
                     <div className="flex justify-center mt-6 mb-2">
                         <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg border border-border">
                             <label className="text-sm text-muted-foreground">Keep files for:</label>

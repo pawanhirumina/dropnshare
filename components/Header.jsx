@@ -28,7 +28,7 @@ export default function Header() {
     const navItems = [
         { href: '/', label: 'Upload' },
         { href: '/download', label: 'Download' },
-        // { href: '/pricing', label: 'Pricing' },
+        { href: '/pricing', label: 'Pricing' },
         { href: '/about', label: 'About' },
     ]
 
@@ -92,8 +92,7 @@ export default function Header() {
                     </Sheet>
                 </div>
 
-                {/* #1 : Payment is not setup fix later */}
-                {/* <div className="hidden md:flex items-center gap-4">
+                <div className="hidden md:flex items-center gap-4">
                     {user ? (
                         <Button asChild variant="outline">
                             <Link href="/account">Account</Link>
@@ -103,7 +102,7 @@ export default function Header() {
                             <Link href="/login">Login</Link>
                         </Button>
                     )}
-                </div> */}
+                </div>
             </div>
         </header>
     )
