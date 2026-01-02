@@ -12,11 +12,25 @@ export async function POST(request) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
+    if (!process.env.DODO_PAYMENTS_API_KEY) console.error('Missing: DODO_PAYMENTS_API_KEY');
+    if (!process.env.DODO_PAYMENTS_PRODUCT_ID) console.error('Missing: DODO_PAYMENTS_PRODUCT_ID');
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) console.error('Missing: NEXT_PUBLIC_SUPABASE_URL');
+
+    if (!process.env.DODO_PAYMENTS_API_KEY || !process.env.DODO_PAYMENTS_PRODUCT_ID) {
+      return NextResponse.json({ error: 'Payment system configuration missing' }, { status: 500 });
+    }
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { billing } = await request.json();
+    let body = {};
+    try {
+      body = await request.json();
+    } catch (e) {
+      console.log('No request body provided, using defaults');
+    }
+    const billing = body.billing;
 
     const session = await client.payments.create({
       billing: {
