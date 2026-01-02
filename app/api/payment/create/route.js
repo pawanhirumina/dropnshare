@@ -30,7 +30,6 @@ export async function POST(request) {
     } catch (e) {
       console.log('No request body provided, using defaults');
     }
-    const billing = body.billing;
 
     const session = await client.payments.create({
       billing: {
