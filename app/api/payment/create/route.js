@@ -16,7 +16,10 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { billing } = await request.json();
+
     const session = await client.payments.create({
+      billing,
       customer: {
         email: user.email,
         name: user.email,
@@ -26,7 +29,7 @@ export async function POST(request) {
         quantity: 1
       }],
       payment_link: true,
-      return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/success`, 
+      return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/success`,
       metadata: {
         userId: user.id
       }
@@ -38,8 +41,8 @@ export async function POST(request) {
     // Check for missing env vars
     if (!process.env.DODO_PAYMENTS_API_KEY) console.error('Missing DODO_PAYMENTS_API_KEY');
     if (!process.env.DODO_PAYMENTS_PRODUCT_ID) console.error('Missing DODO_PAYMENTS_PRODUCT_ID');
-    
-    return NextResponse.json({ 
+
+    return NextResponse.json({
       error: error.message,
       details: error.response ? JSON.stringify(error.response) : 'No response details'
     }, { status: 500 });
