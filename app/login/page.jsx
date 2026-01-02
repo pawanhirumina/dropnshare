@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { signIn, signUp } from '@/lib/auth'
+import { toast } from 'sonner'
 
 function LoginContent() {
     const router = useRouter()
@@ -34,7 +35,9 @@ function LoginContent() {
             } else {
                 const { error } = await signUp(email, password)
                 if (error) throw error
-                alert('Check your email for the confirmation link!')
+                toast.success("Check your email", {
+                    description: "We've sent a confirmation link to your inbox."
+                })
             }
         } catch (err) {
             setError(err.message)

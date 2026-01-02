@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { toast } from 'sonner'
 
 export default function PricingPage() {
     const router = useRouter()
@@ -35,11 +36,15 @@ export default function PricingPage() {
             if (data.url) {
                 window.location.href = data.url;
             } else {
-                alert('Error creating payment session: ' + (data.error || 'Unknown error'));
+                toast.error("Payment Error", {
+                    description: data.error || "Failed to create a payment session."
+                })
             }
         } catch (error) {
             console.error('Payment error:', error);
-            alert('Failed to initiate payment.');
+            toast.error("Process Failed", {
+                description: "Failed to initiate the payment process. Please try again later."
+            })
         }
 
         setLoading(false)
@@ -89,7 +94,7 @@ export default function PricingPage() {
                     {plans.map((plan) => (
                         <Card
                             key={plan.name}
-                            className={plan.popular ? 'border-primary shadow-lg shadow-primary/20' : ''}
+                            className={plan.popular ? 'border-primary' : ''}
                         >
                             {plan.popular && (
                                 <div className="bg-primary text-primary-foreground text-center py-1 text-sm font-medium rounded-t-lg">

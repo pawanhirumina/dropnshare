@@ -2,12 +2,13 @@
 
 import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Download, Loader2, Clock, Infinity } from 'lucide-react'
+import { Download, Loader2, Clock, Infinity, Link as LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 import { Analytics } from "@vercel/analytics/next"
+import { toast } from 'sonner'
 function DownloadContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -18,7 +19,9 @@ function DownloadContent() {
 
     const handleSearch = async () => {
         if (code.length !== 6) {
-            alert('Please enter a valid 6-digit code')
+            toast.warning("Invalid Code", {
+                description: "Please enter a valid 6-digit share code."
+            })
             return
         }
 
@@ -31,7 +34,9 @@ function DownloadContent() {
                 .maybeSingle()
 
             if (error || !data) {
-                alert('File not found. Check your code.')
+                toast.error("File not found", {
+                    description: "Check your code and try again."
+                })
                 setLoading(false)
                 return
             }
@@ -42,7 +47,9 @@ function DownloadContent() {
                 const now = new Date()
 
                 if (expiresAt < now) {
-                    alert('This file has expired.')
+                    toast.error("File expired", {
+                        description: "This file has reached its expiration date and is no longer available."
+                    })
                     setLoading(false)
                     return
                 }
@@ -61,7 +68,9 @@ function DownloadContent() {
             setFileData(data)
         } catch (err) {
             console.error(err)
-            alert('Something went wrong.')
+            toast.error("Error", {
+                description: "Something went wrong while fetching the file."
+            })
         } finally {
             setLoading(false)
         }
@@ -96,9 +105,9 @@ function DownloadContent() {
     }
 
     return (
-        
+
         <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)]">
-              <Analytics/>
+            <Analytics />
             <Card className="w-full max-w-md">
                 <CardContent className="pt-6 space-y-6">
                     <div className="text-center space-y-2">
@@ -162,10 +171,26 @@ function DownloadContent() {
                                     </span>
                                 </div>
                             </div>
-                            <Button className="w-full" onClick={handleDownload}>
-                                <Download className="w-4 h-4 mr-2" />
-                                Download Now
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button className="flex-1" onClick={handleDownload}>
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Download Now
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="px-3"
+                                    onClick={() => {
+                                        const link = `${window.location.origin}/download?code=${fileData.code}`
+                                        navigator.clipboard.writeText(link)
+                                        toast.success("Link copied", {
+                                            description: "The shareable link has been copied to your clipboard."
+                                        })
+                                    }}
+                                    title="Copy Share Link"
+                                >
+                                    <LinkIcon className="w-4 h-4" />
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </CardContent>

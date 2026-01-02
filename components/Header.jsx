@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getCurrentUser } from '@/lib/auth'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Menu, Github } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import {
     Sheet,
     SheetContent,
@@ -103,20 +104,29 @@ export default function Header() {
                 </div>
 
                 <div className="hidden md:flex items-center gap-4">
-                    <Button asChild variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
-                        <Link href="https://github.com/pawanhirumina/drop-n-share" target="_blank" rel="noopener noreferrer">
-                            <Github className="h-5 w-5" />
-                            <span className="sr-only">GitHub Repository</span>
-                        </Link>
-                    </Button>
+                    <Link
+                        href="https://github.com/pawanhirumina/drop-n-share"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-muted-foreground hover:text-primary")}
+                    >
+                        <Github className="h-5 w-5" />
+                        <span className="sr-only">GitHub Repository</span>
+                    </Link>
                     {user ? (
-                        <Button asChild variant="outline">
-                            <Link href="/account">Account</Link>
-                        </Button>
+                        <Link
+                            href="/account"
+                            className={cn(buttonVariants({ variant: "outline" }))}
+                        >
+                            Account
+                        </Link>
                     ) : (
-                        <Button asChild>
-                            <Link href="/login">Login</Link>
-                        </Button>
+                        <Link
+                            href="/login"
+                            className={cn(buttonVariants({ variant: "default" }))}
+                        >
+                            Login
+                        </Link>
                     )}
                 </div>
             </div>
