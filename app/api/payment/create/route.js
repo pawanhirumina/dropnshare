@@ -19,7 +19,13 @@ export async function POST(request) {
     const { billing } = await request.json();
 
     const session = await client.payments.create({
-      billing,
+      billing: {
+        city: 'New York',
+        country: 'US',
+        state: 'NY',
+        street: '123 Main St',
+        zipcode: '10001'
+      },
       customer: {
         email: user.email,
         name: user.email,
