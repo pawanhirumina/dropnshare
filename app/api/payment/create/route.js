@@ -6,19 +6,14 @@ export async function POST(request) {
   console.log('Payment session creation started');
 
   try {
-    // Check for required environment variables first
     const apiKey = process.env.DODO_PAYMENTS_API_KEY;
     const productId = process.env.DODO_PAYMENTS_PRODUCT_ID;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
     if (!apiKey || !productId) {
-      console.error('Missing environment variables:', {
-        hasKey: !!apiKey,
-        hasProductId: !!productId
-      });
       return NextResponse.json({
         error: 'Payment system is not configured',
-        details: 'Missing Dodo Payments configuration'
+        details: `Missing: ${!apiKey ? 'API_KEY' : ''} ${!productId ? 'PRODUCT_ID' : ''}`
       }, { status: 500 });
     }
 
@@ -26,76 +21,62 @@ export async function POST(request) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error('Authentication error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let body = {};
-    try {
-      const text = await request.text();
-      if (text) {
-        body = JSON.parse(text);
-      }
-    } catch (e) {
-      console.warn('Could not parse request body, using defaults');
-    }
-
-    // Initialize DodoPayments client inside the handler
+    // Initialize client with apiKey property
     const client = new DodoPayments({
-      bearerToken: apiKey,
-      // Removed environment parameter to let the SDK infer from the key,
-      // as it might be 'live' or 'test' instead of 'live_mode'
+      apiKey: apiKey,
     });
 
     const formattedSiteUrl = siteUrl
       ? (siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`).replace(/\/$/, '')
-      : 'http://localhost:3000'; // Fallback for local dev
+      : 'http://localhost:3000';
 
     const returnUrl = `${formattedSiteUrl}/payment/success`;
-    console.log('Creating checkout session for user:', user.id, 'with return_url:', returnUrl);
+    console.log('User:', user.id, 'Product:', productId);
 
     const session = await client.checkoutSessions.create({
-      billing: body.billing || {
-        city: 'New York',
-        country: 'US',
-        state: 'NY',
-        street: '123 Main St',
-        zipcode: '10001'
-      },
-      customer: {
-        email: user.email,
-        name: body.customer?.name || user.email || 'Customer',
-      },
       product_cart: [{
         product_id: productId,
         quantity: 1
       }],
+      customer: {
+        email: user.email,
+        name: user.email || 'Customer',
+      },
       return_url: returnUrl,
       metadata: {
-        userId: user.id,
-        ...(typeof body.metadata === 'object' ? body.metadata : {})
+        userId: user.id
       }
     });
 
-    console.log('Checkout session created successfully:', session.checkout_url || session.payment_link);
-
-    const checkoutUrl = session.checkout_url || session.payment_link;
-    if (!checkoutUrl) {
-      console.error('No checkout URL returned from DodoPayments:', session);
-      throw new Error('Payment gateway failed to generate a checkout URL');
+    if (!session || !session.checkout_url) {
+      console.error('Invalid session response:', session);
+      return NextResponse.json({
+        error: 'Invalid response from payment gateway',
+        details: JSON.stringify(session)
+      }, { status: 500 });
     }
 
-    return NextResponse.json({ url: checkoutUrl });
+    return NextResponse.json({ url: session.checkout_url });
 
   } catch (error) {
-    console.error('CRITICAL: Error in payment/create route:', error);
+    console.error('Payment Route Error:', error);
 
-    // Attempt to extract as much info as possible
-    const errorDetails = error.data || error.response?.data || error.message || 'Unknown error';
+    // Extract error message from DodoPayments error object
+    let message = error.message || 'Internal Server Error';
+    let details = 'No additional details available';
+
+    if (error.response) {
+      details = JSON.stringify(error.response.data || error.response || {});
+    } else if (error.data) {
+      details = JSON.stringify(error.data);
+    }
 
     return NextResponse.json({
-      error: 'Failed to create payment session',
-      details: typeof errorDetails === 'object' ? JSON.stringify(errorDetails) : errorDetails
+      error: message,
+      details: details
     }, { status: 500 });
   }
 }
