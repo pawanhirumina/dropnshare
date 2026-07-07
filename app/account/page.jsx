@@ -159,23 +159,22 @@ export default function AccountPage() {
                 </CardTitle>
                 <div className="mt-1 flex flex-wrap gap-2">
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tighter uppercase ${
-                      profile?.plan === "pro"
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tighter uppercase ${profile?.plan === "pro"
                         ? "bg-primary/10 text-primary border border-primary/20"
                         : profile?.plan === "student"
-                        ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
-                        : profile?.plan === "pending_student"
-                        ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                        : "bg-muted text-muted-foreground border border-border/50"
-                    }`}
+                          ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
+                          : profile?.plan === "pending_student"
+                            ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                            : "bg-muted text-muted-foreground border border-border/50"
+                      }`}
                   >
                     {profile?.plan === "pro"
                       ? "Pro Plan"
                       : profile?.plan === "student"
-                      ? "Student Plan"
-                      : profile?.plan === "pending_student"
-                      ? "Verification Pending"
-                      : "Free Plan"}
+                        ? "Student Plan"
+                        : profile?.plan === "pending_student"
+                          ? "Verification Pending"
+                          : "Free Plan"}
                   </span>
                   {user?.email_confirmed_at && (
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20 uppercase tracking-tighter">
@@ -196,58 +195,6 @@ export default function AccountPage() {
             </Button>
           </CardHeader>
         </Card>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Link href="/auth/reset-password" title="Change your password">
-            <Card className="hover:bg-accent/50 transition-colors cursor-pointer border-border/50 group">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Key className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold">Security</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    Reset Password
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {profile?.plan !== "pro" && (
-            <Link href="/pricing" title="View all plans">
-              <Card className="hover:bg-accent/50 transition-colors cursor-pointer border-border/50 group">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Zap className="w-5 h-5 text-amber-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold">Subscription</p>
-                    <p className="text-[10px] text-muted-foreground">
-                      Upgrade Plan
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          )}
-
-          {profile?.plan === "pro" && (
-            <Card className="opacity-50 border-border/50">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold">Pro Active</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    Premium Account
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
 
         <div>
           <div className="flex items-center justify-between mb-6 px-1">
