@@ -75,4 +75,4 @@ To run this project locally:
 5.  Open `http://localhost:5173` in your browser.
 
 ---
-*Made with ❤️ by [Your Name]*
+*Made with ❤️ by Pawan Hirumina*
