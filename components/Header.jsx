@@ -24,7 +24,6 @@ import {
 
 export default function Header() {
     const pathname = usePathname()
-    // eslint-disable-next-line no-unused-vars
     const [user, setUser] = useState(null)
     const [isOpen, setIsOpen] = useState(false)
     const { setTheme, theme } = useTheme()
@@ -65,7 +64,6 @@ export default function Header() {
                     ))}
                 </nav>
 
-                {/* Mobile Sidebar */}
                 <div className="md:hidden">
                     <Sheet open={isOpen} onOpenChange={setIsOpen}>
                         <SheetTrigger asChild>
@@ -96,7 +94,7 @@ export default function Header() {
                                 ))}
                                 <div className="h-px bg-border my-2" />
                                 <Link
-                                    href="https://github.com/pawanhirumina/drop-n-share"
+                                    href="https://github.com/pawanhirumina/dropnshare"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2.5 text-muted-foreground px-3 py-2.5 rounded-md hover:bg-muted/50"
@@ -158,7 +156,7 @@ export default function Header() {
                         <span className="sr-only">Toggle theme</span>
                     </Button>
                     <Link
-                        href="https://github.com/pawanhirumina/drop-n-share"
+                        href="https://github.com/pawanhirumina/dropnshare"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-muted-foreground hover:text-primary")}
